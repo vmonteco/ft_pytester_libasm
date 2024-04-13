@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ft_pytester_libasm"
+version = "0.0.0"
+authors = [
+	{name = "Vincent MONTÉCOT"}
+]
+description = "A small tool to make 42's libASM project's testing easier."
+keywords = [
+	"42",
+	"Born2Code",
+	"42Born2Code",
+	"ASM",
+	"libASM",
+	"tests",
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+	"invoke",
+	"pytest>=7",
+	"tox>=4",
+]
+classifiers = [
+	"Development Status :: 1 - Planning",
+	# To prevent accidental upload on PyPi until mature enough:
+	"Private :: Do Not Upload",
+	"Topic :: Education",
+	"Topic :: Education :: Testing",
+	"Intended Audience :: Education",
+	"Environment :: Console",
+	"Operating System :: POSIX :: Linux",
+	"Operating System :: MacOS",
+	"Natural Language :: English",
+	"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+	"Programming Language :: Python :: 3.10",
+]
+
+[project.urls]
+Repository = "https://github.com/vmonteco/ft_pytester_libasm"
+
+[project.scripts]
+42-pytester-libasm = "ft_pytester_libasm.__main__:program.run"
+ft-pytester-libasm = "ft_pytester_libasm.__main__:program.run"
+42asm = "ft_pytester_libasm.__main__:program.run"
+
+[tool.pytest.ini_options]
+minversion = "8.1.0"
+testpaths = [
+    "tests",
+]
+
+[tool.black]
+target-version = ["py310",]
+line-length = 79
+preview = true
+
+[tool.mypy]
+mypy_path = "ft_pytester_libasm" # TODO: doesn't seem taken into account so far. To be checked.
+
+# TODO: add tools like black, isort, etc.
