@@ -50,7 +50,14 @@ ft-pytester-libasm = "ft_pytester_libasm.__main__:program.run"
 [tool.pytest.ini_options]
 minversion = "8.1.0"
 testpaths = [
-    "tests",
+		  "ft_pytester_libasm",
+		  # "tests",
+		  # "ft_pytester_libasm/base_wrapper",
+		  # "ft_pytester_libasm/linked_lists",
+		  # "ft_pytester_libasm/libasm_wrapper",
+]
+norecursedirs = [
+			  "libasm_test_suite",
 ]
 
 [tool.black]

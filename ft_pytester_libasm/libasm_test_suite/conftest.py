@@ -57,7 +57,7 @@ def libasm(libasm_shared_library_path: str) -> LibASMWrapper:
 
 @pytest.fixture(scope="session")
 def libasm_ref() -> LibASMWrapper:
-    return LibASMWrapper("libc.so", ref=True)
+    return LibASMWrapper("libc.so.6", ref=True)
 
 
 # Arguments related fixtures:
