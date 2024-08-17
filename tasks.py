@@ -3,6 +3,8 @@ from typing import List
 import os
 import sys
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 _static_lib_filename = "libasm.a"
 _shared_lib_filename = "libasm.so"
 _rootdir = "ft_pytester_libasm/libasm_test_suite"
@@ -84,6 +86,11 @@ def test(
     """
     Runs the test suite after building the shared library (if necessary).
     """
+
+    pytest_config_file: str = os.path.join(
+        BASE_DIR, "ft_asm_pytester_pytest.ini"
+    )
+
     repo_path: str = os.path.abspath(path)
     shared_lib_path: str = os.path.join(repo_path, _shared_lib_filename)
     pytest_args: List = []
@@ -103,15 +110,17 @@ def test(
     # TODO: consider using a python pytest invoaction :
     # https://docs.pytest.org/en/6.2.x/usage.html#calling-pytest-from-python-code
     # Or is it better to keep the command line invocation?
-    c.run(
-        (
-            f"pytest -c ft_asm_pytester_pytest.ini --maxfail=42"
-            f" --libasm={shared_lib_path}"
-            f" --color=yes {d} {''.join(pytest_args)}"
-        ),
-        pty=True,
-        echo=True,
-    )
+
+    with c.cd(BASE_DIR):
+        c.run(
+            (
+                f"pytest -c {pytest_config_file} --maxfail=42"
+                f" --libasm={shared_lib_path}"
+                f" --color=yes {d} {''.join(pytest_args)}"
+            ),
+            pty=True,
+            echo=True,
+        )
 
     if clean:
         os.remove(shared_lib_path)
