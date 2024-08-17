@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from ft_pytester_libasm.base_wrapper import Result
+from base_wrapper.result import Result
 
 
 def test_result_integers():
