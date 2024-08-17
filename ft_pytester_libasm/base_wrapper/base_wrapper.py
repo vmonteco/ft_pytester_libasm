@@ -1,8 +1,7 @@
-# TODO: Rewrite docstring
 """
-LibASMWrapper module provides the LibASMWrapper class.
-Its purpose is to build an API around a libASM shared library to
-call (and test) its functions.
+The base_wrapper module provides utilities to build wrapper
+classes that will permit to build APIs on top of shared libraries
+for test purpose.
 """
 
 import ctypes
@@ -28,56 +27,57 @@ class NotImplementedCDLLFunc(CDLLFunc):
 
 # TODO: make it explicitly an abstract class
 class BaseWrapper:
-    # TODO: Rewrite docstring
     """
-    LibASMWrapper builds an API over the libasm.so shared library.
+    This base class is intended to wrap shared libraries to build
+    APIs in python over them for testing purpose.
     """
-
-    libasm_bonus_functions: Dict[str, FuncInfos] = {}
 
     functions: Dict[str, FuncInfos]
-
-    non_ref_prefix: str = "ft_"
 
     def __init__(
         self,
         lib: str | ctypes.CDLL,
         /,
         *,
-        ref: bool = False,
         system_lib: bool = False,
     ) -> None:
         """
         __init__ expects either a path to a shared library (.so), or a
         ctypes.CDLL instance.
 
-        ref parameter can be set to True to provide a reference function for
-        comparison during tests, then the methods embedding the foreign
-        functions won't have their name prefixed with self.non_ref_prefix.
+        lib (str | ctypes.CDLL): Actual CDLL instance, library name or path to
+        library.
+
+        system_lib(bool): determines whether the provided lib path should be
+        resolved as a system library by using an explicit path. Default: False.
         """
+        self.system_lib: bool = system_lib
+
         attr_name: str
 
-        # TODO: check path.
+        # TODO: check path to handle possibly nonexistent file/dir...
         if isinstance(lib, str):
-            # When libasm is passed as a path (str).
+            # When libasm is passed as a path or system library name (str).
             if system_lib:
                 # Not up to this code to handle the
-                # path resolution in that case.
+                # path resolution in that case. The library
+                # is passed as its name.
+                # TODO: handle non-existent lib name.
                 self.cdll = ctypes.cdll.LoadLibrary(lib)
             else:
-                # Fullpath given expected
+                # Explicit path given expected
+                # TODO: handle non-existent path.
                 self.cdll = ctypes.cdll.LoadLibrary(os.path.abspath(lib))
         else:
             # When libasm is passed as a CDLL.
             self.cdll = lib
 
         for func_name, func_infos in self.functions.items():
-            # Bonus functions will also get the prefix anyway.
-            if not ref or func_name in self.libasm_bonus_functions:
-                attr_name = self.non_ref_prefix + func_name
-            else:
-                attr_name = func_name
+            attr_name = self.get_attr_name(func_name)
             self.build_method(attr_name, func_name, func_infos)
+
+    def get_attr_name(self, func_name: str) -> str:
+        return func_name
 
     def build_method(
         self, attr_name: str, func_name: str, func_infos: FuncInfos

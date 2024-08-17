@@ -8,6 +8,7 @@ from base_wrapper.wrapper_types import FuncInfos
 
 
 class LibASMWrapper(BaseWrapper):
+    # TODO: Check this docstring.
     """
     LibASMWrapper are instanciated by providing a shared library path/name
     (.so) or ctypes.CDLL instance to it that should contain the libasm foreign
@@ -98,3 +99,16 @@ class LibASMWrapper(BaseWrapper):
     )
 
     non_ref_prefix: str = "ft_"
+
+    def __init__(self, *args, ref: bool = False, **kwargs):
+        self.ref = ref
+        super().__init__(*args, **kwargs)
+
+    def get_attr_name(self, func_name: str) -> str:
+        """
+        get_attr_name converts func_name in a string that will be returned as
+        a valid attribute name to store wrapping methods.
+        """
+        if not self.ref or func_name in self.libasm_bonus_functions:
+            return self.non_ref_prefix + func_name
+        return func_name
