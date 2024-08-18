@@ -77,7 +77,7 @@ def test_ft_strcmp(
 # @pytest.mark.parametrize("nbyte", [-1, 0, 1, 1048576])
 @pytest.mark.parametrize("nbyte", [-1, 0, 1, 2, 3])
 # TODO: CF: https://stackoverflow.com/q/42014484/3156085
-@pytest.mark.parametrize("fd_infos", [])
+@pytest.mark.parametrize("fd_infos", [(1, 0)])
 def test_ft_write(
     libasm,
     libasm_ref,

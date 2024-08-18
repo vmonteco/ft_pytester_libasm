@@ -114,7 +114,7 @@ def test(
     with c.cd(BASE_DIR):
         c.run(
             (
-                f"pytest -c {pytest_config_file} --maxfail=42"
+                f"pytest -c {pytest_config_file} -v --maxfail=42"
                 f" --libasm={shared_lib_path}"
                 f" --color=yes {d} {''.join(pytest_args)}"
             ),
