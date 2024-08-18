@@ -19,10 +19,14 @@ keywords = [
 ]
 readme = "README.md"
 requires-python = ">=3.10"
+# TODO: Organize dev dependencies
 dependencies = [
 	"invoke",
 	"pytest>=7",
 	"tox>=4",  # dev dependency
+	"flake8",  # dev dependency
+	"pyproject-flake8",  # dev dependency
+	"black",  # dev dependency
 ]
 classifiers = [
 	"Development Status :: 1 - Planning",
@@ -43,15 +47,13 @@ classifiers = [
 Repository = "https://github.com/vmonteco/ft_pytester_libasm"
 
 [project.scripts]
-42-pytester-libasm = "ft_pytester_libasm.__main__:program.run"
-ft-pytester-libasm = "ft_pytester_libasm.__main__:program.run"
-42asm = "ft_pytester_libasm.__main__:program.run"
+42-pytester-libasm = "__main__:program.run"
+ft-pytester-libasm = "__main__:program.run"
+42asm = "__main__:program.run"
 
 [tool.pytest.ini_options]
+addopts = "--strict-markers"
 minversion = "8.1.0"
-testpaths = [
-		  "ft_pytester_libasm",
-]
 norecursedirs = [
 			  "libasm_test_suite",
 ]
@@ -60,8 +62,3 @@ norecursedirs = [
 target-version = ["py310",]
 line-length = 79
 preview = true
-
-[tool.mypy]
-mypy_path = "ft_pytester_libasm" # TODO: doesn't seem taken into account so far. To be checked.
-
-# TODO: add tools like black, isort, etc.

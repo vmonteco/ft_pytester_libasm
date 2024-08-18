@@ -7,14 +7,11 @@ from typing import (
     Dict,
     Optional,
     Tuple,
-    # Callable,
     TypeVar,
-    # Generic,
     Protocol,
     ParamSpec,
     TYPE_CHECKING,
     Union,
-    Any,
     Type,
     NamedTuple,
 )
@@ -31,30 +28,47 @@ __all__ = [
 R = TypeVar("R", covariant=True)
 P = ParamSpec("P")
 
+# Base types:
+
+# Pointer types:
+if TYPE_CHECKING:
+    PointerToChar = ctypes._Pointer[ctypes.c_char]
+else:
+    PointerToChar = ctypes.POINTER(ctypes.c_char)
+
 # Meant to represent possible ASM possible return types.
 ResType = Union[
     ctypes.c_size_t,
     ctypes.c_char_p,
     ctypes.c_int,
+    ctypes.c_char,
     ctypes.c_ssize_t,
+    PointerToChar,
     None,
     # TODO: remove Any
-    Any,
+    # Any,
     # TODO: add linked lists.
 ]
 ResTypeTypeVar = TypeVar("ResTypeTypeVar", bound=ResType, covariant=False)
-ArgTypes = Union[
-    ctypes.c_char_p,
+ArgType = Union[
+    # ctypes.c_char_p,
+    ctypes.c_int,
     # TODO: add linked lists
+    ctypes.c_size_t,
+    ctypes.c_ssize_t,
+    ctypes.c_int,
+    ctypes.c_void_p,
+    ctypes._Pointer,
+    PointerToChar,
 ]
 
 
-class ErrCheck(Protocol[ResTypeTypeVar]):
+class ErrCheck(Protocol[ResTypeTypeVar, P]):
     def __call__(
         self,
         restype: ResTypeTypeVar,
-        func: "CDLLFunc",
-        arguments: Tuple[Type[ArgTypes], ...],
+        func: "CDLLFunc[ResTypeTypeVar, P]",
+        arguments: Tuple[Type[ArgType], ...],
         /,
     ) -> ResTypeTypeVar: ...
 
@@ -63,19 +77,21 @@ class ErrCheck(Protocol[ResTypeTypeVar]):
 FdToWriteTo = NewType("FdToWriteTo", int)
 FdToListenOn = NewType("FdToListenOn", int)
 
+# Will be used for `fdopen` calls.
+Mode = NewType("Mode", str)
+
 # Associated Fds may be useless. So could be FdsToWriteTo's int parameter.
-FdToWriteToInfos = Tuple[bytes, int, FdToListenOn]
-FdsToWriteTo = Dict[FdToWriteTo, FdToWriteToInfos]
-FdToListenOnInfos = Tuple[int, FdToWriteTo]
-FdsToListenOn = Dict[FdToListenOn, FdToListenOnInfos]
+FdToWriteToInfos = Tuple[bytes, ctypes.c_size_t, FdToListenOn, Optional[Mode]]
+FdsToWriteToInfos = Dict[FdToWriteTo, FdToWriteToInfos]
+FdToListenOnInfos = Tuple[ctypes.c_size_t, FdToWriteTo, Optional[Mode]]
+FdsToListenOnInfos = Dict[FdToListenOn, FdToListenOnInfos]
 
 # TODO: Those are possibly useless.
 # But if used, perhaps it could be a NewType as well.
 SizeToRead = int
 SizeToWrite = int
 
-# TODO: set this
-CapturedOutputs = Any
+CapturedOutputs = Dict[FdToWriteTo, Tuple[bytes, FdToListenOn]]
 
 
 # To store infos about function (restype, argstypes, errcheck...).
@@ -83,7 +99,7 @@ CapturedOutputs = Any
 # But this could be a generic on restype.
 class FuncInfos(NamedTuple):
     restype: Type[ResType]
-    argtypes: Tuple[Type[ArgTypes], ...]
+    argtypes: Tuple[Type[ArgType], ...]
     errcheck: Optional[ErrCheck]
 
 
@@ -94,7 +110,7 @@ class FuncInfos(NamedTuple):
 
 class CDLLFunc(Protocol[ResTypeTypeVar, P]):
     restype: Type[ResTypeTypeVar]
-    argtypes: Tuple[Type[ArgTypes], ...]
+    argtypes: Tuple[Type[ArgType], ...]
     errcheck: Optional[ErrCheck]
 
     def __call__(
@@ -107,7 +123,7 @@ class WrappedCDLLFunc(Protocol[ResTypeTypeVar, P]):
         self,
         *args: P.args,
         # new kwargs here
-        fds_to_write_to: Optional[FdsToWriteTo] = None,
-        fds_to_listen_on: Optional[FdsToListenOn] = None,
+        fds_to_write_to: Optional[FdsToWriteToInfos] = None,
+        fds_to_listen_on: Optional[FdsToListenOnInfos] = None,
         **kwargs: P.kwargs,
     ) -> "Result[ResTypeTypeVar]": ...

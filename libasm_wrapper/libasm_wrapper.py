@@ -4,7 +4,8 @@ from typing import (
 )
 
 from base_wrapper import BaseWrapper
-from base_wrapper.wrapper_types import FuncInfos
+from base_wrapper.wrapper_types import FuncInfos, PointerToChar
+from base_wrapper.utils import pointer_to_char_errcheck, integer_errcheck
 
 
 class LibASMWrapper(BaseWrapper):
@@ -27,40 +28,40 @@ class LibASMWrapper(BaseWrapper):
 
     libasm_mandatory_functions: Dict[str, FuncInfos] = {
         "strlen": FuncInfos(
-            argtypes=(ctypes.c_char_p,),
+            argtypes=(PointerToChar,),
             restype=ctypes.c_size_t,
             errcheck=None,
         ),
         "strcpy": FuncInfos(
             argtypes=(
-                ctypes.c_char_p,
-                ctypes.c_char_p,
+                PointerToChar,
+                PointerToChar,
             ),
-            restype=ctypes.c_size_t,
+            restype=ctypes.POINTER(ctypes.c_char),
             errcheck=None,
         ),
         "strcmp": FuncInfos(
             argtypes=(
-                ctypes.c_char_p,
-                ctypes.c_char_p,
+                PointerToChar,
+                PointerToChar,
             ),
-            restype=int,
+            restype=ctypes.c_int,
             errcheck=None,
         ),
         "write": FuncInfos(
-            argtypes=(),
-            restype=type(None),
-            errcheck=None,  # TODO: write can set errno.
+            argtypes=(ctypes.c_int, ctypes.c_void_p, ctypes.c_size_t),
+            restype=ctypes.c_ssize_t,
+            errcheck=integer_errcheck,  # TODO: write can set errno.
         ),
         "read": FuncInfos(
-            argtypes=(),
-            restype=type(None),
-            errcheck=None,  # TODO: read can set errno.
+            argtypes=(ctypes.c_int, ctypes.c_void_p, ctypes.c_size_t),
+            restype=ctypes.c_ssize_t,
+            errcheck=integer_errcheck,  # TODO: read can set errno.
         ),
         "strdup": FuncInfos(
-            argtypes=(),
-            restype=type(None),
-            errcheck=None,  # TODO: write can set errno.
+            argtypes=(ctypes.POINTER(ctypes.c_char),),
+            restype=ctypes.POINTER(ctypes.c_char),
+            errcheck=pointer_to_char_errcheck,  # TODO: write can set errno.
         ),
     }
 

@@ -63,11 +63,11 @@ class BaseWrapper:
                 # path resolution in that case. The library
                 # is passed as its name.
                 # TODO: handle non-existent lib name.
-                self.cdll = ctypes.cdll.LoadLibrary(lib)
+                self.cdll = ctypes.CDLL(lib, use_errno=True)
             else:
                 # Explicit path given expected
                 # TODO: handle non-existent path.
-                self.cdll = ctypes.cdll.LoadLibrary(os.path.abspath(lib))
+                self.cdll = ctypes.CDLL(os.path.abspath(lib), use_errno=True)
         else:
             # When libasm is passed as a CDLL.
             self.cdll = lib

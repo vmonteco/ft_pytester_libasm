@@ -7,17 +7,15 @@ different tests to run.
 """
 
 from libasm_wrapper import LibASMWrapper
-from typing import List, Optional
 from linked_lists import IntLinkedList
 import ctypes
 import pytest
 import os
 
-# def path_checker(path):
-#     # TODO: complete this.
-#     return path
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
+# Add --libasm parameter to pytest:
 def pytest_addoption(parser):
     parser.addoption(
         "--libasm",
@@ -28,6 +26,7 @@ def pytest_addoption(parser):
     )
 
 
+# Shared libraries:
 @pytest.fixture(scope="session")
 def libasm_shared_library_path(request: pytest.FixtureRequest) -> str:
     """
@@ -60,61 +59,37 @@ def libasm_ref() -> LibASMWrapper:
     return LibASMWrapper("libc.so.6", ref=True, system_lib=True)
 
 
-# Arguments related fixtures:
-# Types to handle:
+@pytest.fixture(scope="session")
+def libc() -> ctypes.CDLL:
+    libc = ctypes.CDLL("libc.so.6", use_errno=True)
 
-bytes_vals: List[bytes] = [
-    b"",
-    b"foo",
-    b"bar",
-    b" " * 1048576,
-]
+    # set strlen:
+    libc.strlen.restype = ctypes.c_size_t
+    libc.strlen.argtypes = (ctypes.c_char_p,)
+
+    return libc
+
+
+# String buffers:
+@pytest.fixture
+def string_buffer_1() -> ctypes.Array[ctypes.c_char]:
+    return ctypes.create_string_buffer(1)
 
 
 @pytest.fixture
-@pytest.mark.parametrize("s", bytes_vals)
-def bytes_1(s: Optional[bytes]) -> Optional[bytes]:
-    return s
+def string_buffer_4() -> ctypes.Array[ctypes.c_char]:
+    return ctypes.create_string_buffer(4)
 
 
 @pytest.fixture
-@pytest.mark.parametrize("s", bytes_vals)
-def bytes_2(s: Optional[bytes]) -> Optional[bytes]:
-    return s
+def string_buffer_1048577() -> ctypes.Array[ctypes.c_char]:
+    return ctypes.create_string_buffer(1048577)
 
 
-optional_bytes_vals: List[Optional[bytes]] = [
-    None,
-]
-# + c_char_p_vals
-
-
+# strdup-specific
 @pytest.fixture
-@pytest.mark.parametrize("s", optional_bytes_vals)
-def optionnal_bytes_1(s: Optional[bytes]) -> Optional[bytes]:
-    return s
-
-
-@pytest.fixture
-@pytest.mark.parametrize("s", optional_bytes_vals)
-def optionnal_bytes_2(s: Optional[bytes]) -> Optional[bytes]:
-    return s
-
-
-@pytest.fixture
-@pytest.mark.parametrize("size", list(set(len(b) + 1 for b in bytes_vals)))
-def bytes_buffer(size: int):
-    return ctypes.create_string_buffer(size + 1)
-
-
-# Mandatory part:
-# - c_char_p (with NULL included).
-# - c_char_p (without NULL)
-# - c_int
-# - File descriptor
-# - c_void_p
-# - c_size_t
-
+def test_suite_base_directory() -> str:
+    return BASE_DIR
 
 # Bonus part:
 @pytest.fixture

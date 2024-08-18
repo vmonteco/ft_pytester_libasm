@@ -1,13 +1,25 @@
 from invoke import task, Context
-from typing import List
+from typing import List, Optional
 import os
 import sys
+from libasm_wrapper.tags import (
+    LibASMTag,
+    all_tags,
+)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 _static_lib_filename = "libasm.a"
 _shared_lib_filename = "libasm.so"
-_rootdir = "ft_pytester_libasm/libasm_test_suite"
+_rootdir = "libasm_test_suite"
+
+# strdup related:
+_run_strdup_src_filename = "run_ft_strdup.c"
+_run_strdup_src_path = os.path.join(
+    os.path.join(BASE_DIR, "libasm_test_suite/bin_tools"),
+    _run_strdup_src_filename,
+)
+_run_strdup_path = _run_strdup_src_path.replace(".c", "")
 
 
 @task(
@@ -47,24 +59,49 @@ def _build(c: Context, /, *, path: str = ".") -> None:
         static_lib_path
     ), f"Error: File {static_lib_path} not found."
 
+    # Strdup-related build:
+    c.run(
+        f"gcc -o {_run_strdup_path} -L {repo_path} {_run_strdup_src_path} "
+        f"{static_lib_path}"
+    )
+
     # Build shared library from the static one (if libasm.so is older than
     # libasm.so):
     c.run(
-        f'echo "Creating {_static_lib_filename}'
-        f' out of {_shared_lib_filename}."'
+        f'echo "Creating {_shared_lib_filename}'
+        f' out of {_static_lib_filename}."'
     )
     if not os.path.isfile(shared_lib_path) or os.path.getmtime(
         static_lib_path
     ) > os.path.getmtime(shared_lib_path):
         c.run(
             f"gcc -shared -o {shared_lib_path} -Wl,--whole-archive"
-            f"{static_lib_path} -Wl,--no-whole-archive"
+            f" {static_lib_path} -Wl,--no-whole-archive"
         )
     else:
         c.run(
             f'echo "{shared_lib_path} younger than {static_lib_path}.'
             f' Nothing to do."'
         )
+
+
+functions_tree = {
+    "mandatory": {
+        "ft_strlen",
+        "ft_strcpy",
+        "ft_strcmp",
+        "ft_write",
+        "ft_read",
+        "ft_strdup",
+    },
+    "bonus": {
+        "ft_atoi_base",
+        "ft_list_push_front",
+        "ft_list_size",
+        "ft_list_sort",
+        "ft_list_remove_if",
+    },
+}
 
 
 @task(
@@ -74,7 +111,16 @@ def _build(c: Context, /, *, path: str = ".") -> None:
         "path": "path to the libasm repo.",
         "clean": "remove the shared library (libasm.so) after the tests.",
         "build": "build the static library (libasm.a).",
+        # TODO: Improve description.
+        # "includes": "directory containing the libasm.h",
+        "tests": (
+            "Marks to designate tests to run. Available choices are : "
+            "{tags}. This option can be specified several times to specify "
+            "several tests to run. No test specified will result in running "
+            "all available tests."
+        ).format(tags=", ".join([tag.value for tag in all_tags])),
     },
+    iterable=["tests"],
 )
 def test(
     c: Context,
@@ -82,10 +128,14 @@ def test(
     clean: bool = False,
     build: bool = True,
     debug: bool = False,
+    tests: Optional[List[LibASMTag]] = None,
 ) -> None:
     """
     Runs the test suite after building the shared library (if necessary).
     """
+
+    if tests is None:
+        tests = []
 
     pytest_config_file: str = os.path.join(
         BASE_DIR, "ft_asm_pytester_pytest.ini"
@@ -111,15 +161,17 @@ def test(
     # https://docs.pytest.org/en/6.2.x/usage.html#calling-pytest-from-python-code
     # Or is it better to keep the command line invocation?
 
+    tests_flags: str = '-m "' + " or ".join(flag for flag in tests) + '"'
+
     with c.cd(BASE_DIR):
         c.run(
             (
-                f"pytest -c {pytest_config_file} -v --maxfail=42"
+                f"pytest -c {pytest_config_file} -sv --maxfail=42"
                 f" --libasm={shared_lib_path}"
                 f" --color=yes {d} {''.join(pytest_args)}"
+                f" {tests_flags}"
             ),
             pty=True,
-            echo=True,
         )
 
     if clean:

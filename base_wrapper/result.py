@@ -4,8 +4,7 @@ encapsulate the observed behaviour of a shared library function
 (not only the return value).
 """
 
-from typing import Optional, Generic, Any
-from ctypes import c_int
+from typing import Optional, Generic
 from .wrapper_types import (
     ResTypeTypeVar,
     CapturedOutputs,
@@ -19,19 +18,16 @@ class Result(Generic[ResTypeTypeVar]):
     Result is meant to encapsulate the behaviour of a shared library
     function call.
 
-    It will include the return value, captured outputs and the
-    possible errno.
+    It will include the return value and the captured outputs.
     """
 
-    return_value: Any
+    return_value: ResTypeTypeVar
     outputs: CapturedOutputs
-    errno: Optional[c_int]
 
     def __init__(
         self,
         return_value,
         captured_outputs: Optional[CapturedOutputs] = None,
-        errno: Optional[c_int] = None,
     ):
         """
         __init__ takes one mandatory argument (`return_value`)
@@ -41,7 +37,6 @@ class Result(Generic[ResTypeTypeVar]):
             self.outputs = {}
         else:
             self.outputs = captured_outputs
-        self.errno = errno
         self.return_value = return_value
 
     def __eq__(self, val) -> bool:
@@ -58,13 +53,16 @@ class Result(Generic[ResTypeTypeVar]):
             return (
                 self.return_value == val.return_value
                 and self.outputs == val.outputs
-                and self.errno == val.errno
             )
         return self == Result(val)
 
-    # TODO: Should it really be FDToReadFrom? Not FDToWriteTo
-    #       (cf. CapturedOutputs definition)?
     def add_output(
-        self, output: bytes, fd: FdToListenOn, associated_fd: FdToWriteTo
+        self,
+        output: bytes,
+        fd_output_was_read_on: FdToListenOn,
+        fd_output_was_written_to: FdToWriteTo,
     ) -> None:
-        self.outputs[fd] = output
+        self.outputs[fd_output_was_written_to] = (
+            output,
+            fd_output_was_read_on,
+        )
