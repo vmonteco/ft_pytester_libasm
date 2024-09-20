@@ -134,7 +134,7 @@ functions_tree = {
 def test(
     c: Context,
     path: str = ".",  # Path to repository to test.
-    clean: bool = False,
+    clean: bool = True,
     build: bool = True,
     debug: bool = False,
     tests: Optional[List[LibASMTag]] = None,
@@ -185,6 +185,7 @@ def test(
 
     if clean:
         os.remove(shared_lib_path)
+        os.remove(_run_strdup_path)
 
 
 @task

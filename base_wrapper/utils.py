@@ -12,6 +12,7 @@ def integer_errcheck(
     arguments: Tuple[Type[ArgType], ...],
     /,
 ) -> ctypes.c_int:
+    breakpoint()
     if result == -1:
         errno: int = ctypes.get_errno()
         raise OSError(errno, os.strerror(errno))
@@ -24,6 +25,7 @@ def pointer_to_char_errcheck(
     arguments: Tuple[Type[ArgType], ...],
     /,
 ) -> PointerToChar:
+    breakpoint()
     if result is None:
         errno: int = ctypes.get_errno()
         raise OSError(errno, os.strerror(errno))

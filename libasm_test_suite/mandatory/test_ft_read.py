@@ -29,9 +29,9 @@ import pytest
         (b" " * 1024 * 32, 1024 * 32, 1024 * 32),
     ],
     ids=[
-        "Empty str with count: 3 (exp: 3)",
+        "Empty str with count: 0 (exp: 0)",
         '"foo" with count: 3 (exp: 3)',
-        '"foo" with count: 3 (exp: 0)',
+        '"foo" with count: 0 (exp: 0)',
         "1024*32-long str",
     ],
 )
