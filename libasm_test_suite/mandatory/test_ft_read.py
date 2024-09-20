@@ -36,7 +36,7 @@ import pytest
     ],
 )
 def test_ft_read(
-    libasm_ref,
+    libasm,
     data_to_write: bytes,
     count: ctypes.c_size_t,
     expected_result: ctypes.c_ssize_t,
@@ -51,7 +51,7 @@ def test_ft_read(
         len(data_to_write) + 1
     )
 
-    res: Result[ctypes.c_ssize_t] = libasm_ref.read(
+    res: Result[ctypes.c_ssize_t] = libasm.ft_read(
         fd_r,
         ctypes.cast(buf, ctypes.c_void_p),
         count,
@@ -66,7 +66,7 @@ def test_ft_read(
 @tag_test(MandatoryFunctionTag.FT_READ)
 @tag_test(ErrorTag.ERRNO)
 def test_ft_read_errno_bad_file_descriptor(
-    libasm_ref,
+    libasm,
 ) -> None:
     fd: int
     errno: int
@@ -76,7 +76,7 @@ def test_ft_read_errno_bad_file_descriptor(
     fd = os.open("/dev/null", os.O_WRONLY)
     with pytest.raises(OSError):
         try:
-            libasm_ref.read(fd, buffer, 2)
+            libasm.ft_read(fd, buffer, 2)
         except OSError as e:
             errno = e.errno
             raise
@@ -90,7 +90,7 @@ def test_ft_read_errno_bad_file_descriptor(
 @tag_test(MandatoryFunctionTag.FT_READ)
 @tag_test(ErrorTag.ERRNO)
 def test_ft_read_errno_bad_address(
-    libasm_ref,
+    libasm,
 ) -> None:
     fd: int
     errno: int
@@ -98,7 +98,7 @@ def test_ft_read_errno_bad_address(
     fd = os.open("/dev/zero", os.O_RDONLY)
     with pytest.raises(OSError):
         try:
-            libasm_ref.read(fd, -1, 3)
+            libasm.ft_read(fd, -1, 3)
         except OSError as e:
             errno = e.errno
             raise

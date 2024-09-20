@@ -36,6 +36,7 @@ def _build(c: Context, /, *, path: str = ".") -> None:
     static_lib_path: str = os.path.join(repo_path, _static_lib_filename)
     shared_lib_path: str = os.path.join(repo_path, _shared_lib_filename)
     makefile_path: str = os.path.join(repo_path, "Makefile")
+    includes_path: str = os.path.join(repo_path, "includes")
 
     c.run('echo "Running build task"')
 
@@ -60,11 +61,18 @@ def _build(c: Context, /, *, path: str = ".") -> None:
     ), f"Error: File {static_lib_path} not found."
 
     # Strdup-related build:
+    # c.run(
+    #     f"gcc -o {_run_strdup_path} -L {repo_path} {_run_strdup_src_path} "
+    #     f"{static_lib_path}",
+    #     echo=True,
+    # )
     c.run(
-        f"gcc -o {_run_strdup_path} -L {repo_path} {_run_strdup_src_path} "
-        f"{static_lib_path}"
+        f"gcc -Wall -Werror -Wextra -g -o {_run_strdup_path} -I {includes_path} {_run_strdup_src_path} "
+        f"{static_lib_path}  -L {repo_path}",
+        echo=True,
     )
 
+    
     # Build shared library from the static one (if libasm.so is older than
     # libasm.so):
     c.run(
@@ -75,8 +83,9 @@ def _build(c: Context, /, *, path: str = ".") -> None:
         static_lib_path
     ) > os.path.getmtime(shared_lib_path):
         c.run(
-            f"gcc -shared -o {shared_lib_path} -Wl,--whole-archive"
-            f" {static_lib_path} -Wl,--no-whole-archive"
+            f"gcc -shared -g -o {shared_lib_path} -Wl,--whole-archive"
+            f" {static_lib_path} -Wl,--no-whole-archive",
+            echo=True,
         )
     else:
         c.run(

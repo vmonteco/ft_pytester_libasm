@@ -6,7 +6,7 @@
 /*   By: vmonteco <vmonteco@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/18 22:35:43 by vmonteco          #+#    #+#             */
-/*   Updated: 2024/09/19 23:04:20 by vmonteco         ###   ########.fr       */
+/*   Updated: 2024/09/20 18:53:04 by vmonteco         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,7 @@
 #include <string.h>
 #include <sys/resource.h>
 #include <stdio.h>
-
-char	*ft_strdup(const char *s);
+#include "libasm.h"
 
 int		main(void)
 {
@@ -39,7 +38,7 @@ int		main(void)
 		perror(strerror(errno));
 		return (1);
 	}
-	lim.rlim_cur = 1024;
+	lim.rlim_cur = 4096;
 	if (setrlimit(RLIMIT_DATA, &lim) == -1)
 	{
 		perror(strerror(errno));
