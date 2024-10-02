@@ -72,7 +72,6 @@ def _build(c: Context, /, *, path: str = ".") -> None:
         echo=True,
     )
 
-    
     # Build shared library from the static one (if libasm.so is older than
     # libasm.so):
     c.run(
@@ -83,7 +82,7 @@ def _build(c: Context, /, *, path: str = ".") -> None:
         static_lib_path
     ) > os.path.getmtime(shared_lib_path):
         c.run(
-            f"gcc -shared -g -o {shared_lib_path} -Wl,--whole-archive"
+            f"gcc -shared -g -nodefaultlibs -o {shared_lib_path} -Wl,--whole-archive"
             f" {static_lib_path} -Wl,--no-whole-archive",
             echo=True,
         )
@@ -153,6 +152,8 @@ def test(
     repo_path: str = os.path.abspath(path)
     shared_lib_path: str = os.path.join(repo_path, _shared_lib_filename)
     pytest_args: List = []
+    print(f"{path = }\n{repo_path = }\n{shared_lib_path = }")
+
     d = " --pdb " if debug else ""
 
     c.run('echo "Running test task"')

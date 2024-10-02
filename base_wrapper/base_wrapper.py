@@ -6,23 +6,41 @@ for test purpose.
 
 import ctypes
 import os
-from typing import Dict
+from typing import Dict, Type, Tuple
 
 from .decorators import (
     wrap_CDLL_func,
 )
-from .wrapper_types import FuncInfos, CDLLFunc, WrappedCDLLFunc
+from .wrapper_types import FuncInfos, CDLLFunc, WrappedCDLLFunc, P
 
 
-class NotImplementedCDLLFunc(CDLLFunc):
-    def __init__(self, attr_name: str):
-        self.attr_name: str = attr_name
-        self.restype = type(None)
-        self.argtypes = ()
-        self.errcheck = None
+class NotImplementedCDLLFunc(CDLLFunc[None, P]):
+    restype: Type[None] = type(None)
+    argtypes: Tuple = ()
+    errcheck: None = None
+    func_name: str
 
-    def __call__(self):
+    def __init__(self, func_name: str) -> None:
+        self.func_name = func_name
+
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> None:
         raise NotImplementedError(f"{self.func_name} not implemented.")
+
+
+def make_not_implemented_CDLLFunc(func_name: str) -> CDLLFunc[None, P]:
+
+    return NotImplementedCDLLFunc("func_name")
+
+
+# def NotImplementedCDLLFuncFactory(CDLLFunc):
+#     def __init__(self, attr_name: str):
+#         self.attr_name: str = attr_name
+#         self.restype = type(None)
+#         self.argtypes = ()
+#         self.errcheck = None
+
+#     def __call__(self, *args, **kwargs):
+#         raise NotImplementedError(f"{self.func_name} not implemented.")
 
 
 # TODO: make it explicitly an abstract class
@@ -58,6 +76,7 @@ class BaseWrapper:
         # TODO: check path to handle possibly nonexistent file/dir...
         if isinstance(lib, str):
             # When libasm is passed as a path or system library name (str).
+            print(f"[Base wrapper]: loading {lib}.")
             if system_lib:
                 # Not up to this code to handle the
                 # path resolution in that case. The library
@@ -74,17 +93,21 @@ class BaseWrapper:
 
         for func_name, func_infos in self.functions.items():
             attr_name = self.get_attr_name(func_name)
+            func_name = self.get_src_func_name(func_name)
             self.build_method(attr_name, func_name, func_infos)
 
     def get_attr_name(self, func_name: str) -> str:
+        return func_name
+
+    def get_src_func_name(self, func_name: str) -> str:
         return func_name
 
     def build_method(
         self, attr_name: str, func_name: str, func_infos: FuncInfos
     ) -> None:
         f_decorated: WrappedCDLLFunc
-        f = getattr(
-            self.cdll, func_name, NotImplementedCDLLFunc(attr_name=attr_name)
+        f: CDLLFunc = getattr(
+            self.cdll, func_name, make_not_implemented_CDLLFunc(func_name)
         )
         f.argtypes = func_infos.argtypes
         f.restype = func_infos.restype
@@ -92,3 +115,4 @@ class BaseWrapper:
             f.errcheck = func_infos.errcheck
         f_decorated = wrap_CDLL_func(f)
         setattr(self, attr_name, f_decorated)
+        setattr(self, "raw_" + attr_name, f)

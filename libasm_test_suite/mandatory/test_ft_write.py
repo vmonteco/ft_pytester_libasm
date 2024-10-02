@@ -80,7 +80,7 @@ def test_ft_write_errno_bad_descriptor(
         fd = os.open(tmpfile.name, os.O_RDONLY)
         with pytest.raises(OSError):
             try:
-                libasm.ft_write(
+                libasm.raw_ft_write(
                     fd,
                     buf,
                     nbytes,
@@ -107,7 +107,7 @@ def test_ft_write_errno_no_space_left_on_device(
     fd = os.open("/dev/full", os.O_WRONLY)
     with pytest.raises(OSError):
         try:
-            libasm.ft_write(
+            libasm.raw_ft_write(
                 fd,
                 buf,
                 nbytes,

@@ -51,15 +51,18 @@ def libasm(libasm_shared_library_path: str) -> LibASMWrapper:
     It uses the libasm_shared_library_path to determine where to find
     it.
     """
+    print(f"[Fixture libasm] : loading {libasm_shared_library_path}")
     return LibASMWrapper(libasm_shared_library_path, ref=False)
 
 
-@pytest.fixture(scope="session")
+# @pytest.fixture(scope="session")
+@pytest.fixture
 def libasm_ref() -> LibASMWrapper:
     return LibASMWrapper("libc.so.6", ref=True, system_lib=True)
 
 
-@pytest.fixture(scope="session")
+# @pytest.fixture(scope="session")
+@pytest.fixture
 def libc() -> ctypes.CDLL:
     libc = ctypes.CDLL("libc.so.6", use_errno=True)
 
@@ -90,6 +93,7 @@ def string_buffer_1048577() -> ctypes.Array[ctypes.c_char]:
 @pytest.fixture
 def test_suite_base_directory() -> str:
     return BASE_DIR
+
 
 # Bonus part:
 @pytest.fixture

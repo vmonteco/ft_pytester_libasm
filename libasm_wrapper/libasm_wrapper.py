@@ -113,3 +113,13 @@ class LibASMWrapper(BaseWrapper):
         if not self.ref or func_name in self.libasm_bonus_functions:
             return self.non_ref_prefix + func_name
         return func_name
+
+    def get_src_func_name(self, func_name: str) -> str:
+        """
+        get_src_func_name behaves similarly as get_attr_name.
+
+        It provides the attribute name of the foreign function to retrieve.
+        """
+        if not self.ref or func_name in self.libasm_bonus_functions:
+            return self.non_ref_prefix + func_name
+        return func_name
