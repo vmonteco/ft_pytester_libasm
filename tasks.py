@@ -67,8 +67,9 @@ def _build(c: Context, /, *, path: str = ".") -> None:
     #     echo=True,
     # )
     c.run(
-        f"gcc -Wall -Werror -Wextra -g -o {_run_strdup_path} -I {includes_path} {_run_strdup_src_path} "
-        f"{static_lib_path}  -L {repo_path}",
+        f"gcc -Wall -Werror -Wextra -g -o {_run_strdup_path} "
+        f"-I {includes_path} {_run_strdup_src_path} "
+        f"{static_lib_path} -L {repo_path}",
         echo=True,
     )
 
@@ -82,7 +83,8 @@ def _build(c: Context, /, *, path: str = ".") -> None:
         static_lib_path
     ) > os.path.getmtime(shared_lib_path):
         c.run(
-            f"gcc -shared -g -nodefaultlibs -o {shared_lib_path} -Wl,--whole-archive"
+            f"gcc -shared -g -nodefaultlibs -o {shared_lib_path} "
+            f"-Wl,--whole-archive"
             f" {static_lib_path} -Wl,--no-whole-archive",
             echo=True,
         )
