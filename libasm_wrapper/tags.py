@@ -56,16 +56,21 @@ class BonusFunctionTag(StrEnum):
     FT_LIST_REMOVE_IF = "ft_list_remove_if"
 
 
+class ToolFunctionTag(StrEnum):
+    FT_STRCHR = "ft_strchr"
+
+
 class CategoryTag(StrEnum):
     MANDATORY = "mandatory"
     BONUS = "bonus"
+    TOOL = "tool"
 
 
 class ErrorTag(StrEnum):
     ERRNO = "errno"
 
 
-FunctionTag = Union[MandatoryFunctionTag, BonusFunctionTag]
+FunctionTag = Union[MandatoryFunctionTag, BonusFunctionTag, ToolFunctionTag]
 LibASMTag = Union[CategoryTag, FunctionTag, ErrorTag]
 
 all_tags: Sequence[LibASMTag] = (

@@ -44,6 +44,7 @@ ResType = Union[
     ctypes.c_char,
     ctypes.c_ssize_t,
     PointerToChar,
+    ctypes.c_void_p,
     None,
     # TODO: remove Any
     # Any,

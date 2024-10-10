@@ -11,6 +11,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 _static_lib_filename = "libasm.a"
 _shared_lib_filename = "libasm.so"
+_static_lib_filename_bonus = "libasm_bonus.a"
+_shared_lib_filename_bonus = "libasm_bonus.so"
 _rootdir = "libasm_test_suite"
 
 # strdup related:
@@ -25,16 +27,23 @@ _run_strdup_path = _run_strdup_src_path.replace(".c", "")
 @task(
     name="build",
 )
-def _build(c: Context, /, *, path: str = ".") -> None:
+def _build(c: Context, /, *, path: str = ".", bonus: bool = False) -> None:
     """
     The build task takes a libasm repository path and runs its Makefile to
     build the libasm static library (libasm.a). It then builds the shared
     library (libasm.so) out of it.
     """
     # Get paths:
+    static_lib_path: str
+    shared_lib_path: str
+
     repo_path: str = os.path.abspath(path)
-    static_lib_path: str = os.path.join(repo_path, _static_lib_filename)
-    shared_lib_path: str = os.path.join(repo_path, _shared_lib_filename)
+    if bonus:
+        static_lib_path = os.path.join(repo_path, _static_lib_filename_bonus)
+        shared_lib_path = os.path.join(repo_path, _shared_lib_filename_bonus)
+    else:
+        static_lib_path = os.path.join(repo_path, _static_lib_filename)
+        shared_lib_path = os.path.join(repo_path, _shared_lib_filename)
     makefile_path: str = os.path.join(repo_path, "Makefile")
     includes_path: str = os.path.join(repo_path, "includes")
 
@@ -53,7 +62,10 @@ def _build(c: Context, /, *, path: str = ".") -> None:
     # Run make:
     c.run(f'echo "Creating {_static_lib_filename} by running the Makefile."')
     # TODO: add other rules as options.
-    c.run(f"make -C {repo_path}")
+    if bonus:
+        c.run(f"make -C {repo_path} bonus")
+    else:
+        c.run(f"make -C {repo_path}")
 
     # Ensure that libasm.a was created:
     assert os.path.isfile(
@@ -119,6 +131,7 @@ functions_tree = {
     default=True,
     help={
         "path": "path to the libasm repo.",
+        "bonus": "build bonus lib",
         "clean": "remove the shared library (libasm.so) after the tests.",
         "build": "build the static library (libasm.a).",
         # TODO: Improve description.
@@ -135,6 +148,7 @@ functions_tree = {
 def test(
     c: Context,
     path: str = ".",  # Path to repository to test.
+    bonus: bool = False,
     clean: bool = True,
     build: bool = True,
     debug: bool = False,
@@ -143,6 +157,7 @@ def test(
     """
     Runs the test suite after building the shared library (if necessary).
     """
+    shared_lib_path: str
 
     if tests is None:
         tests = []
@@ -152,7 +167,10 @@ def test(
     )
 
     repo_path: str = os.path.abspath(path)
-    shared_lib_path: str = os.path.join(repo_path, _shared_lib_filename)
+    if bonus:
+        shared_lib_path = os.path.join(repo_path, _shared_lib_filename_bonus)
+    else:
+        shared_lib_path = os.path.join(repo_path, _shared_lib_filename)
     pytest_args: List = []
     print(f"{path = }\n{repo_path = }\n{shared_lib_path = }")
 
@@ -161,7 +179,7 @@ def test(
     c.run('echo "Running test task"')
 
     if build:
-        _build(c, path=repo_path)
+        _build(c, path=repo_path, bonus=bonus)
 
     # Ensuring that the shared library exists:
     assert os.path.isfile(

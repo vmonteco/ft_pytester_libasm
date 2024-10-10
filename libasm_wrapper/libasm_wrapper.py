@@ -68,8 +68,11 @@ class LibASMWrapper(BaseWrapper):
     # TODO: complete infos on bonus functions.
     libasm_bonus_functions: Dict[str, FuncInfos] = {
         "atoi_base": FuncInfos(
-            argtypes=(),
-            restype=type(None),
+            argtypes=(
+                ctypes.POINTER(ctypes.c_char),
+                ctypes.POINTER(ctypes.c_char),
+            ),
+            restype=ctypes.c_int,
             errcheck=None,
         ),
         "list_push_front": FuncInfos(
@@ -94,9 +97,18 @@ class LibASMWrapper(BaseWrapper):
         ),
     }
 
+    libasm_tool_functions: Dict[str, FuncInfos] = {
+        "strchr": FuncInfos(
+            argtypes=(ctypes.c_void_p, ctypes.c_int),
+            restype=ctypes.c_void_p,
+            errcheck=None,
+        ),
+    }
+
     functions: Dict[str, FuncInfos] = dict(
         **libasm_mandatory_functions,
         **libasm_bonus_functions,
+        **libasm_tool_functions,
     )
 
     non_ref_prefix: str = "ft_"
