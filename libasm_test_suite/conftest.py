@@ -51,7 +51,6 @@ def libasm(libasm_shared_library_path: str) -> LibASMWrapper:
     It uses the libasm_shared_library_path to determine where to find
     it.
     """
-    print(f"[Fixture libasm] : loading {libasm_shared_library_path}")
     return LibASMWrapper(libasm_shared_library_path, ref=False)
 
 

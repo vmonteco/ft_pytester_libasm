@@ -76,7 +76,6 @@ class BaseWrapper:
         # TODO: check path to handle possibly nonexistent file/dir...
         if isinstance(lib, str):
             # When libasm is passed as a path or system library name (str).
-            print(f"[Base wrapper]: loading {lib}.")
             if system_lib:
                 # Not up to this code to handle the
                 # path resolution in that case. The library

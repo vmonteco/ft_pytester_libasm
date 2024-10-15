@@ -158,6 +158,7 @@ def test(
     Runs the test suite after building the shared library (if necessary).
     """
     shared_lib_path: str
+    tests_flags: str
 
     if tests is None:
         tests = []
@@ -172,7 +173,6 @@ def test(
     else:
         shared_lib_path = os.path.join(repo_path, _shared_lib_filename)
     pytest_args: List = []
-    print(f"{path = }\n{repo_path = }\n{shared_lib_path = }")
 
     d = " --pdb " if debug else ""
 
@@ -191,8 +191,14 @@ def test(
     # https://docs.pytest.org/en/6.2.x/usage.html#calling-pytest-from-python-code
     # Or is it better to keep the command line invocation?
 
-    tests_flags: str = '-m "' + " or ".join(flag for flag in tests) + '"'
-
+    if not tests:
+        if bonus:
+            tests_flags = ''
+        else:
+            tests_flags = '-m mandatory'
+    else:
+        tests_flags = '-m "' + " or ".join(flag for flag in tests) + '"'
+    
     with c.cd(BASE_DIR):
         c.run(
             (

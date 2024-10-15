@@ -28,6 +28,13 @@ BASE16_low: bytes = b"0123456789abcdef"
         (b"\x15\x15", 0x2A, None),
         (b" " * 255 + b"\x2a", 0x2A, 255),
     ],
+    ids=[
+        "In empty str (exp: NULL)",
+        "char contained at index 0",
+        "char contained at index 1",
+        "char not contained",
+        "char contained at index 255",
+    ],
 )
 def test_ft_strchr(libasm, s: bytes, c: ctypes.c_int, exp: Optional[int]):
     """
