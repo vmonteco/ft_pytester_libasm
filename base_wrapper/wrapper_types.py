@@ -16,6 +16,8 @@ from typing import (
     NamedTuple,
 )
 
+from t_list import TList
+
 # This permits to avoid circular imports.
 if TYPE_CHECKING:
     from .result import Result
@@ -33,8 +35,10 @@ P = ParamSpec("P")
 # Pointer types:
 if TYPE_CHECKING:
     PointerToChar = ctypes._Pointer[ctypes.c_char]
+    PointerToFunc = ctypes._Pointer[ctypes.CFUNCTYPE]
 else:
     PointerToChar = ctypes.POINTER(ctypes.c_char)
+    PointerToFunc = ctypes._CFuncPtr
 
 # Meant to represent possible ASM possible return types.
 ResType = Union[
@@ -61,6 +65,7 @@ ArgType = Union[
     ctypes.c_void_p,
     ctypes._Pointer,
     PointerToChar,
+    PointerToFunc,
 ]
 
 

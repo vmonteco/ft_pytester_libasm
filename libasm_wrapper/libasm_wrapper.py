@@ -6,7 +6,7 @@ from typing import (
 from base_wrapper import BaseWrapper
 from base_wrapper.wrapper_types import FuncInfos, PointerToChar
 from base_wrapper.utils import pointer_to_char_errcheck, integer_errcheck
-
+from t_list import TList
 
 class LibASMWrapper(BaseWrapper):
     # TODO: Check this docstring.
@@ -76,22 +76,33 @@ class LibASMWrapper(BaseWrapper):
             errcheck=None,
         ),
         "list_push_front": FuncInfos(
-            argtypes=(),
+            argtypes=(
+                ctypes.POINTER(ctypes.POINTER(TList)),
+                ctypes.c_void_p,
+            ),
             restype=type(None),
             errcheck=None,
         ),
         "list_size": FuncInfos(
-            argtypes=(),
-            restype=type(None),
+            argtypes=(ctypes.POINTER(TList),),
+            restype=ctypes.c_int,
             errcheck=None,
         ),
         "list_sort": FuncInfos(
-            argtypes=(),
+            argtypes=(
+                ctypes.POINTER(ctypes.POINTER(TList)),
+                ctypes.CFUNCTYPE(ctypes.c_int),
+            ),
             restype=type(None),
             errcheck=None,
         ),
         "list_remove_if": FuncInfos(
-            argtypes=(),
+            argtypes=(
+                ctypes.POINTER(ctypes.POINTER(TList)),
+                ctypes.c_void_p,
+                ctypes.CFUNCTYPE(ctypes.c_int),
+                ctypes.CFUNCTYPE(None, ctypes.c_void_p)
+            ),
             restype=type(None),
             errcheck=None,
         ),
