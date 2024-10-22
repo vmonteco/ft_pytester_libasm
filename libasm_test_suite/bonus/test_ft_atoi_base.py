@@ -103,6 +103,15 @@ def test_ft_strchr(libasm, s: bytes, c: ctypes.c_int, exp: Optional[int]):
         (b"2A", BASE16_low, 2),
         (b"-2A", BASE16_low, -2),
         (b"10", BASE16_low, 16),
+        (b"5555", BASE10, 5555),
+        (
+            b"10",
+            b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,.",
+            64,
+        ),
+        (b"", b"314", 0),
+        (b"314", b"314", 5),
+        (b"413", b"314", 21),
     ],
 )
 def test_ft_atoi_base(libasm, _str: bytes, base: bytes, exp: int) -> None:

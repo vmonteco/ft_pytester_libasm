@@ -193,12 +193,12 @@ def test(
 
     if not tests:
         if bonus:
-            tests_flags = ''
+            tests_flags = ""
         else:
-            tests_flags = '-m mandatory'
+            tests_flags = "-m mandatory"
     else:
         tests_flags = '-m "' + " or ".join(flag for flag in tests) + '"'
-    
+
     with c.cd(BASE_DIR):
         c.run(
             (
