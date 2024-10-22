@@ -5,7 +5,7 @@
 # https://stackoverflow.com/a/64348247/3156085
 
 
-from libasm_wrapper.tags import MandatoryFunctionTag, CategoryTag, tag_test
+from ft_pytester_libasm.libasm_wrapper.tags import MandatoryFunctionTag, CategoryTag, tag_test
 import ctypes
 import pytest
 

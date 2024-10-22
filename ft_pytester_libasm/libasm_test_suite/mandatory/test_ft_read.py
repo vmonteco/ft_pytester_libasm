@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """"""
 
-from libasm_wrapper.tags import (
+from ft_pytester_libasm.libasm_wrapper.tags import (
     MandatoryFunctionTag,
     CategoryTag,
     ErrorTag,
     tag_test,
 )
-from base_wrapper import Result
-from base_wrapper.wrapper_types import (
+from ft_pytester_libasm.base_wrapper import Result
+from ft_pytester_libasm.base_wrapper.wrapper_types import (
     FdToListenOn,
     FdToWriteTo,
     FdsToWriteToInfos,

@@ -2,23 +2,25 @@ from invoke import task, Context
 from typing import List, Optional
 import os
 import sys
-from libasm_wrapper.tags import (
+from ft_pytester_libasm.libasm_wrapper.tags import (
     LibASMTag,
     all_tags,
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PKG_DIR = os.path.join(BASE_DIR, "ft_pytester_libasm")
+TEST_SUITE_DIR = os.path.join(PKG_DIR, "libasm_test_suite")
 
 _static_lib_filename = "libasm.a"
 _shared_lib_filename = "libasm.so"
 _static_lib_filename_bonus = "libasm_bonus.a"
 _shared_lib_filename_bonus = "libasm_bonus.so"
-_rootdir = "libasm_test_suite"
+_rootdir = PKG_DIR
 
 # strdup related:
 _run_strdup_src_filename = "run_ft_strdup.c"
 _run_strdup_src_path = os.path.join(
-    os.path.join(BASE_DIR, "libasm_test_suite/bin_tools"),
+    os.path.join(PKG_DIR, "libasm_test_suite/bin_tools"),
     _run_strdup_src_filename,
 )
 _run_strdup_path = _run_strdup_src_path.replace(".c", "")
@@ -164,7 +166,7 @@ def test(
         tests = []
 
     pytest_config_file: str = os.path.join(
-        BASE_DIR, "ft_asm_pytester_pytest.ini"
+        PKG_DIR, "ft_asm_pytester_pytest.ini"
     )
 
     repo_path: str = os.path.abspath(path)
@@ -199,7 +201,7 @@ def test(
     else:
         tests_flags = '-m "' + " or ".join(flag for flag in tests) + '"'
 
-    with c.cd(BASE_DIR):
+    with c.cd(PKG_DIR):
         c.run(
             (
                 f"pytest -c {pytest_config_file} -sv --maxfail=42"
@@ -208,6 +210,7 @@ def test(
                 f" {tests_flags}"
             ),
             pty=True,
+            echo=True,
         )
 
     if clean:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """"""
 
-from libasm_wrapper.tags import MandatoryFunctionTag, CategoryTag, tag_test
+from ft_pytester_libasm.libasm_wrapper.tags import MandatoryFunctionTag, CategoryTag, tag_test
 import pytest
 
 

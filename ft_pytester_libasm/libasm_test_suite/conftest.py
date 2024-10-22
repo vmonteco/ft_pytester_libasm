@@ -6,8 +6,8 @@ to wrap the libasm.so file to test and make it accessible to the
 different tests to run.
 """
 
-from libasm_wrapper import LibASMWrapper
-from linked_lists import IntLinkedList
+from ft_pytester_libasm.libasm_wrapper import LibASMWrapper
+from ft_pytester_libasm.linked_lists import IntLinkedList
 import ctypes
 import pytest
 import os

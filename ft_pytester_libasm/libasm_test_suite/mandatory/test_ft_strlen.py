@@ -6,7 +6,7 @@ C standard : 7.1.4.1
 https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf
 """
 
-from libasm_wrapper.tags import MandatoryFunctionTag, CategoryTag, tag_test
+from ft_pytester_libasm.libasm_wrapper.tags import MandatoryFunctionTag, CategoryTag, tag_test
 import pytest
 
 

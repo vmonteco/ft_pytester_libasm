@@ -3,9 +3,9 @@ from typing import (
     Dict,
 )
 
-from base_wrapper import BaseWrapper
-from base_wrapper.wrapper_types import FuncInfos, PointerToChar
-from base_wrapper.utils import pointer_to_char_errcheck, integer_errcheck
+from ft_pytester_libasm.base_wrapper import BaseWrapper
+from ft_pytester_libasm.base_wrapper.wrapper_types import FuncInfos, PointerToChar
+from ft_pytester_libasm.base_wrapper.utils import pointer_to_char_errcheck, integer_errcheck
 
 
 class LibASMWrapper(BaseWrapper):

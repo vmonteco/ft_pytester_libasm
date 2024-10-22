@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from libasm_wrapper.tags import (
+from ft_pytester_libasm.libasm_wrapper.tags import (
     BonusFunctionTag,
     ToolFunctionTag,
     CategoryTag,

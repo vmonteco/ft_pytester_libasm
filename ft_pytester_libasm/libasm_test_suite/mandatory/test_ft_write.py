@@ -5,18 +5,18 @@
 # to know how many bytes write should access, and not on the nul-termination.
 # Otherwise there wouldn't be the count parameter at all.
 
-from libasm_wrapper.tags import (
+from ft_pytester_libasm.libasm_wrapper.tags import (
     MandatoryFunctionTag,
     CategoryTag,
     ErrorTag,
     tag_test,
 )
-from base_wrapper.wrapper_types import (
+from ft_pytester_libasm.base_wrapper.wrapper_types import (
     FdToWriteTo,
     FdToListenOn,
     FdsToListenOnInfos,
 )
-from base_wrapper import Result
+from ft_pytester_libasm.base_wrapper import Result
 import errno
 import ctypes
 import os
